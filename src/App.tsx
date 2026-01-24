@@ -3,6 +3,7 @@ import HabitCard from './components/HabitCard'
 import AddHabitForm from './components/AddHabitForm'
 import Stats from './components/Stats'
 import ThemeToggle from './components/ThemeToggle'
+import ResetButton from './components/ResetButton'
 import type { Habit } from './types'
 
 const STORAGE_KEY = 'habit-tracker-habits'
@@ -77,11 +78,16 @@ function App() {
     setHabits(habits.filter(habit => habit.id !== id))
   }
 
+  const resetAllHabits = () => {
+    setHabits(habits.map(habit => ({...habit, isCompleted: false})))
+  }
+
   const toggleTheme = () => {
     setIsDark(!isDark)
   }
 
   const completedCount = habits.filter(habit => habit.isCompleted).length
+  const hasCompletedHabits = completedCount > 0
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 transition-colors">
@@ -96,6 +102,8 @@ function App() {
       
       <Stats totalHabits={habits.length} completedHabits={completedCount} />
       
+      <ResetButton onReset={resetAllHabits} hasCompletedHabits={hasCompletedHabits} />
+
       <AddHabitForm onAdd={addHabit} />
       
       <div className="mt-6">
