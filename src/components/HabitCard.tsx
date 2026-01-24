@@ -1,35 +1,40 @@
-import { useState } from 'react'
-
+import type { Habit } from '../types'
 
 interface HabitCardProps {
-    name: string
-    description: string
+  habit: Habit
+  onToggle: (id: string) => void
+  onDelete: (id: string) => void
 }
 
-function HabitCard({name, description}: HabitCardProps) {
-    const [isCompleted, setIsCompleted] = useState(false)
-
-    const handleComplete = () => {
-        setIsCompleted(!isCompleted)
-    }
-
+function HabitCard({ habit, onToggle, onDelete }: HabitCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-4">
-      <h3 className="text-xl font-semibold text-gray-800">
-       {name}
-      </h3>
-      <p className="text-gray-500 text-sm mt-1">
-       {description}
-      </p>
-      <button 
-      onClick={handleComplete}
-      className= {`mt-4 px-4 py-2 rounded ${
-          isCompleted 
-            ? 'bg-green-500 hover:bg-green-600' 
-            : 'bg-blue-500 hover:bg-blue-600'
-        } text-white`}
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-4 transition-colors">
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+          {habit.name}
+        </h3>
+        <button
+          onClick={() => onDelete(habit.id)}
+          className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm font-medium"
+          aria-label="Delete habit"
         >
-       {isCompleted ? '✓ Completed' : 'Complete'}
+          Delete
+        </button>
+      </div>
+      
+      <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 mb-4">
+        {habit.description}
+      </p>
+      
+      <button 
+        onClick={() => onToggle(habit.id)}
+        className={`mt-2 px-4 py-2 rounded transition-colors ${
+          habit.isCompleted 
+            ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700' 
+            : 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+        } text-white`}
+      >
+        {habit.isCompleted ? '✓ Completed' : 'Complete'}
       </button>
     </div>
   )
