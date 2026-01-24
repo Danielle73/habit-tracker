@@ -1,40 +1,32 @@
 import { useState, useEffect } from 'react'
 import HabitCard from './components/HabitCard'
 import AddHabitForm from './components/AddHabitForm'
+import CategoryForm from './components/CategoryForm'
+import CategorySection from './components/CategorySection'
 import Stats from './components/Stats'
 import ThemeToggle from './components/ThemeToggle'
 import ResetButton from './components/ResetButton'
-import type { Habit } from './types'
+import type { Habit, Category } from './types'
 
 const STORAGE_KEY = 'habit-tracker-habits'
+const CATEGORIES_KEY = 'habit-tracker-categories'
 const THEME_KEY = 'habit-tracker-theme'
 
 function App() {
+  const [categories, setCategories] = useState<Category[]>(() => {
+    const saved = localStorage.getItem(CATEGORIES_KEY)
+    if (saved) {
+      return JSON.parse(saved)
+    }
+    return []
+  })
+
   const [habits, setHabits] = useState<Habit[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
       return JSON.parse(saved)
     }
-    return [
-      {
-        id: '1',
-        name: 'Drink Water',
-        description: 'Stay hydrated throughout the day',
-        isCompleted: false
-      },
-      {
-        id: '2',
-        name: 'Exercise',
-        description: '30 minutes of physical activity',
-        isCompleted: false
-      },
-      {
-        id: '3',
-        name: 'Meditate',
-        description: '10 minutes of mindfulness',
-        isCompleted: false
-      }
-    ]
+    return []
   })
 
   const [isDark, setIsDark] = useState(() => {
@@ -47,6 +39,10 @@ function App() {
   }, [habits])
 
   useEffect(() => {
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories))
+  }, [categories])
+
+  useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add('dark')
       localStorage.setItem(THEME_KEY, 'dark')
@@ -56,6 +52,21 @@ function App() {
     }
   }, [isDark])
 
+  const addCategory = (name: string, color: string, icon: string) => {
+    const newCategory: Category = {
+      id: Date.now().toString(),
+      name,
+      color,
+      icon
+    }
+    setCategories([...categories, newCategory])
+  }
+
+  const deleteCategory = (categoryId: string) => {
+    setCategories(categories.filter(cat => cat.id !== categoryId))
+    setHabits(habits.filter(habit => habit.categoryId !== categoryId))
+  }
+
   const toggleHabit = (id: string) => {
     setHabits(habits.map(habit => 
       habit.id === id 
@@ -64,12 +75,13 @@ function App() {
     ))
   }
 
-  const addHabit = (name: string, description: string) => {
+  const addHabit = (name: string, description: string, categoryId: string) => {
     const newHabit: Habit = {
       id: Date.now().toString(),
       name,
       description,
-      isCompleted: false
+      isCompleted: false,
+      categoryId
     }
     setHabits([...habits, newHabit])
   }
@@ -79,7 +91,7 @@ function App() {
   }
 
   const resetAllHabits = () => {
-    setHabits(habits.map(habit => ({...habit, isCompleted: false})))
+    setHabits(habits.map(habit => ({ ...habit, isCompleted: false })))
   }
 
   const toggleTheme = () => {
@@ -88,6 +100,16 @@ function App() {
 
   const completedCount = habits.filter(habit => habit.isCompleted).length
   const hasCompletedHabits = completedCount > 0
+
+  // Group habits by category
+  const getHabitsByCategory = (categoryId: string) => {
+    return habits.filter(habit => habit.categoryId === categoryId)
+  }
+
+  // Get uncategorized habits (shouldn't happen, but just in case)
+  const uncategorizedHabits = habits.filter(
+    habit => !categories.some(cat => cat.id === habit.categoryId)
+  )
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 transition-colors">
@@ -103,25 +125,50 @@ function App() {
       <Stats totalHabits={habits.length} completedHabits={completedCount} />
       
       <ResetButton onReset={resetAllHabits} hasCompletedHabits={hasCompletedHabits} />
-
-      <AddHabitForm onAdd={addHabit} />
+      
+      <CategoryForm onAdd={addCategory} />
+      
+      <AddHabitForm onAdd={addHabit} categories={categories} />
       
       <div className="mt-6">
-        {habits.length === 0 ? (
+        {categories.length === 0 ? (
           <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow">
-            <p className="text-gray-500 dark:text-gray-400 text-lg">
-              No habits yet. Add your first habit above! 👆
+            <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">
+              No categories yet. Create your first category above! 👆
+            </p>
+            <p className="text-gray-400 dark:text-gray-500 text-sm">
+              Try categories like: Beauty 💅, Exercise 💪, Learning 📚
             </p>
           </div>
         ) : (
-          habits.map(habit => (
-            <HabitCard
-              key={habit.id}
-              habit={habit}
-              onToggle={toggleHabit}
-              onDelete={deleteHabit}
-            />
-          ))
+          <>
+            {categories.map(category => (
+              <CategorySection
+                key={category.id}
+                category={category}
+                habits={getHabitsByCategory(category.id)}
+                onToggle={toggleHabit}
+                onDelete={deleteHabit}
+                onDeleteCategory={deleteCategory}
+              />
+            ))}
+            
+            {uncategorizedHabits.length > 0 && (
+              <div className="mt-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <p className="text-yellow-800 dark:text-yellow-200 font-medium mb-2">
+                  ⚠️ Uncategorized Habits
+                </p>
+                {uncategorizedHabits.map(habit => (
+                  <HabitCard
+                    key={habit.id}
+                    habit={habit}
+                    onToggle={toggleHabit}
+                    onDelete={deleteHabit}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
