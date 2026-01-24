@@ -101,12 +101,10 @@ function App() {
   const completedCount = habits.filter(habit => habit.isCompleted).length
   const hasCompletedHabits = completedCount > 0
 
-  // Group habits by category
   const getHabitsByCategory = (categoryId: string) => {
     return habits.filter(habit => habit.categoryId === categoryId)
   }
 
-  // Get uncategorized habits (shouldn't happen, but just in case)
   const uncategorizedHabits = habits.filter(
     habit => !categories.some(cat => cat.id === habit.categoryId)
   )
@@ -122,7 +120,10 @@ function App() {
         Track your daily habits and build consistency
       </p>
       
-      <Stats totalHabits={habits.length} completedHabits={completedCount} />
+      <Stats 
+      totalHabits={habits.length} 
+      completedHabits={completedCount} 
+      totalCategories={categories.length}/>
       
       <ResetButton onReset={resetAllHabits} hasCompletedHabits={hasCompletedHabits} />
       

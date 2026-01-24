@@ -10,15 +10,43 @@ function AddHabitForm({ onAdd, categories }: AddHabitFormProps) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [selectedCategoryId, setSelectedCategoryId] = useState('')
+  const [errors, setErrors] = useState({
+    name: false,
+    category: false
+  })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (name.trim() === '' || selectedCategoryId === '') return
-    
+
+    const newErrors = {
+      name: name.trim() === '',
+      category: selectedCategoryId === ''
+    }
+
+    setErrors(newErrors)
+
+    if(newErrors.name || newErrors.category){
+      return
+    }
+  
     onAdd(name, description, selectedCategoryId)
     setName('')
     setDescription('')
+    setErrors({name: false, category: false})
+  }
+
+  const handleNameChange = (value: string) => {
+    setName(value)
+    if(errors.name && value.trim() !== ''){
+      setErrors({...errors, name: false})
+    }
+  }
+
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategoryId(value)
+    if(errors.category && value !== ''){
+      setErrors({...errors, category: false})
+    }
   }
 
   if (categories.length === 0) {
@@ -39,13 +67,17 @@ function AddHabitForm({ onAdd, categories }: AddHabitFormProps) {
 
       <div className="mb-4">
         <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Category
+          Category *
         </label>
         <select
           id="category"
           value={selectedCategoryId}
-          onChange={(e) => setSelectedCategoryId(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+          onChange={(e) => handleCategoryChange(e.target.value)}
+          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all ${
+            errors.category
+              ? 'border-red-500 focus:ring-red-500 animate-shake'
+              : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
+          }`}
         >
           <option value="">Select a category...</option>
           {categories.map((category) => (
@@ -54,20 +86,34 @@ function AddHabitForm({ onAdd, categories }: AddHabitFormProps) {
             </option>
           ))}
         </select>
+        {errors.category && (
+          <p className="mt-1 text-sm text-red-500 dark:text-red-400 animate-slideIn">
+            Please select a category
+          </p>
+        )}
       </div>
       
       <div className="mb-4">
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Habit Name
+          Habit Name *
         </label>
         <input
           type="text"
           id="name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => handleNameChange(e.target.value)}
           placeholder="e.g., Skincare routine"
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all ${
+            errors.name
+              ? 'border-red-500 focus:ring-red-500 animate-shake'
+              : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
+          }`}
         />
+        {errors.name && (
+          <p className="mt-1 text-sm text-red-500 dark:text-red-400 animate-slideIn">
+            Habit name is required
+          </p>
+        )}
       </div>
       
       <div className="mb-4">

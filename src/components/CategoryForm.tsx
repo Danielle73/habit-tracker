@@ -22,17 +22,29 @@ function CategoryForm({ onAdd }: CategoryFormProps) {
   const [selectedColor, setSelectedColor] = useState('bg-blue-500')
   const [selectedIcon, setSelectedIcon] = useState('✨')
   const [isOpen, setIsOpen] = useState(false)
+  const [nameError, setNameError] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (name.trim() === '') return
+    if (name.trim() === '') {
+        setNameError(true)
+        return
+    }
     
     onAdd(name, selectedColor, selectedIcon)
     setName('')
     setSelectedColor('bg-blue-500')
     setSelectedIcon('✨')
     setIsOpen(false)
+    setNameError(false)
+  }
+
+  const handleNameChange = (value: string) => {
+    setName(value)
+    if (nameError && value.trim() !== ''){
+        setNameError(false)
+    }
   }
 
   if (!isOpen) {
@@ -54,7 +66,10 @@ function CategoryForm({ onAdd }: CategoryFormProps) {
         </h2>
         <button
           type="button"
-          onClick={() => setIsOpen(false)}
+          onClick={() => {
+            setIsOpen(false) 
+            setNameError(false)
+        }}
           className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
         >
           ✕
@@ -63,16 +78,26 @@ function CategoryForm({ onAdd }: CategoryFormProps) {
       
       <div className="mb-4">
         <label htmlFor="categoryName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Category Name
+          Category Name *
         </label>
         <input
           type="text"
           id="categoryName"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => handleNameChange(e.target.value)}
           placeholder="e.g., Beauty, Exercise, Work"
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-        />
+          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all ${
+            nameError
+              ? 'border-red-500 focus:ring-red-500 animate-shake'
+              : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
+          }`}        
+          />
+          {nameError && (
+          <p className="mt-1 text-sm text-red-500 dark:text-red-400 animate-slideIn">
+            Category name is required
+          </p>
+        )}
+
       </div>
 
       <div className="mb-4">
@@ -128,7 +153,10 @@ function CategoryForm({ onAdd }: CategoryFormProps) {
         </button>
         <button
           type="button"
-          onClick={() => setIsOpen(false)}
+          onClick={() => {
+            setIsOpen(false)
+            setNameError(false)
+        }}
           className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
           Cancel
