@@ -9,20 +9,17 @@ function App(){
       <p className="text-gray-600 mb-8">
         Track your daily habits and build consistency
       </p>
+
+      <AddHabitForm onAdd={addHabit} />
       
-      <HabitCard 
-      name = "Drink Water"
-      description="Stay hydrated throughout the day"/>
-      <HabitCard 
-      name = "Exercise"
-      description="30 minutes of physical activity"/>
-      <HabitCard 
-      name = "Meditate"
-      description="10 minutes of mindfulness"/>
-      <HabitCard 
-      name="Practice Language"
-      description="Do your duolingo"
-      />
+      {habits.map(habit => (
+        <HabitCard
+        key = {habit.id}
+        habit = {habit}
+        onToggle = {toggleHabit}
+        onDelete = {deleteHabit}
+        />
+      ))}
     </div>
   )
 }
