@@ -1,3 +1,5 @@
+import ProgressBar from "./ProgressBar"
+
 interface StatsProps {
   totalHabits: number
   completedHabits: number
@@ -14,6 +16,8 @@ function Stats({ totalHabits, completedHabits }: StatsProps) {
         Today's Progress
       </h2>
       
+      <ProgressBar percentage={percentage} />
+
       <div className="grid grid-cols-3 gap-4">
         <div className="text-center transform transition-transform hover:scale-110">
           <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 transition-all">
