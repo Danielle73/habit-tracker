@@ -4,6 +4,9 @@ export interface Habit {
   description: string
   isCompleted: boolean
   categoryId: string
+  completionHistory: string[]
+  currentStreak: number
+  bestStreak: number
 }
 
 export interface Category {
@@ -11,4 +14,10 @@ export interface Category {
   name: string
   color: string
   icon: string
+}
+
+export interface DailyStats {
+  date: string
+  completed: number
+  total: number
 }

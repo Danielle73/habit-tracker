@@ -7,6 +7,9 @@ import Stats from './components/Stats'
 import ThemeToggle from './components/ThemeToggle'
 import ResetButton from './components/ResetButton'
 import type { Habit, Category } from './types'
+import { migrateHabits } from './utils/migration'
+import { getTodayString, isCompletedToday, calculateStreak, calculateBestStreak } from './utils/streaks'
+import Analytics from './components/Analytics'
 
 const STORAGE_KEY = 'habit-tracker-habits'
 const CATEGORIES_KEY = 'habit-tracker-categories'
@@ -24,7 +27,9 @@ function App() {
   const [habits, setHabits] = useState<Habit[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
-      return JSON.parse(saved)
+      const parsed = JSON.parse(saved)
+      // Migrate old habits to new format
+      return migrateHabits(parsed)
     }
     return []
   })
@@ -68,11 +73,31 @@ function App() {
   }
 
   const toggleHabit = (id: string) => {
-    setHabits(habits.map(habit => 
-      habit.id === id 
-        ? { ...habit, isCompleted: !habit.isCompleted }
-        : habit
-    ))
+    setHabits(habits.map(habit => {
+      if (habit.id !== id) return habit
+      
+      const today = getTodayString()
+      let newHistory = [...habit.completionHistory]
+      
+      // If already completed today, remove today from history
+      if (isCompletedToday(habit.completionHistory)) {
+        newHistory = newHistory.filter(date => date !== today)
+      } else {
+        // Add today to history
+        newHistory.push(today)
+      }
+      
+      const currentStreak = calculateStreak(newHistory)
+      const bestStreak = Math.max(calculateBestStreak(newHistory), habit.bestStreak)
+      
+      return {
+        ...habit,
+        completionHistory: newHistory,
+        isCompleted: isCompletedToday(newHistory),
+        currentStreak,
+        bestStreak
+      }
+    }))
   }
 
   const addHabit = (name: string, description: string, categoryId: string) => {
@@ -81,7 +106,10 @@ function App() {
       name,
       description,
       isCompleted: false,
-      categoryId
+      categoryId,
+      completionHistory: [],
+      currentStreak: 0,
+      bestStreak: 0
     }
     setHabits([...habits, newHabit])
   }
@@ -91,7 +119,13 @@ function App() {
   }
 
   const resetAllHabits = () => {
-    setHabits(habits.map(habit => ({ ...habit, isCompleted: false })))
+    const today = getTodayString()
+    setHabits(habits.map(habit => ({
+      ...habit,
+      completionHistory: habit.completionHistory.filter(date => date !== today),
+      isCompleted: false,
+      currentStreak: calculateStreak(habit.completionHistory.filter(date => date !== today))
+    })))
   }
 
   const toggleTheme = () => {
@@ -121,10 +155,14 @@ function App() {
       </p>
       
       <Stats 
-      totalHabits={habits.length} 
-      completedHabits={completedCount} 
-      totalCategories={categories.length}/>
+        totalHabits={habits.length} 
+        completedHabits={completedCount} 
+        totalCategories={categories.length}
+        habits={habits}
+      />
       
+      <Analytics habits={habits} categories={categories} />
+
       <ResetButton onReset={resetAllHabits} hasCompletedHabits={hasCompletedHabits} />
       
       <CategoryForm onAdd={addCategory} />
