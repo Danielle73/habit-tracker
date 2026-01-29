@@ -57,6 +57,52 @@ function App() {
     }
   }, [isDark])
 
+// Auto-reset completions for new day
+useEffect(() => {
+  const checkAndResetDay = () => {
+    const lastResetDate = localStorage.getItem('habit-tracker-last-reset')
+    const today = getTodayString()
+    
+    console.log('🔍 Checking reset...')
+    console.log('Last reset date:', lastResetDate)
+    console.log('Today:', today)
+    
+    if (lastResetDate !== today) {
+      console.log('✅ New day detected! Resetting...')
+      
+      setHabits(currentHabits => {
+        const updated = currentHabits.map(habit => {
+          const newIsCompleted = isCompletedToday(habit.completionHistory)
+          console.log(`Habit "${habit.name}":`, {
+            completionHistory: habit.completionHistory,
+            wasCompleted: habit.isCompleted,
+            nowCompleted: newIsCompleted
+          })
+          
+          return {
+            ...habit,
+            isCompleted: newIsCompleted,
+            currentStreak: calculateStreak(habit.completionHistory),
+            bestStreak: calculateBestStreak(habit.completionHistory)
+          }
+        })
+        
+        return updated
+      })
+      
+      localStorage.setItem('habit-tracker-last-reset', today)
+      console.log('💾 Saved new reset date:', today)
+    } else {
+      console.log('⏸️ Same day, no reset needed')
+    }
+  }
+  
+  checkAndResetDay()
+  
+  const interval = setInterval(checkAndResetDay, 60000)
+  return () => clearInterval(interval)
+}, [])
+
   const addCategory = (name: string, color: string, icon: string) => {
     const newCategory: Category = {
       id: Date.now().toString(),
@@ -158,7 +204,6 @@ function App() {
         totalHabits={habits.length} 
         completedHabits={completedCount} 
         totalCategories={categories.length}
-        habits={habits}
       />
       
       <Analytics habits={habits} categories={categories} />

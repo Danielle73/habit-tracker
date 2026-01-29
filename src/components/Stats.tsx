@@ -5,7 +5,6 @@ interface StatsProps {
   totalHabits: number
   completedHabits: number
   totalCategories: number
-  habits: Habit[]
 }
 
 function Stats({ totalHabits, completedHabits, totalCategories, habits }: StatsProps) {
