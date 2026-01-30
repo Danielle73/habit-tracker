@@ -1,5 +1,4 @@
 import ProgressBar from './ProgressBar'
-import type { Habit } from '../types'
 
 interface StatsProps {
   totalHabits: number
@@ -7,7 +6,7 @@ interface StatsProps {
   totalCategories: number
 }
 
-function Stats({ totalHabits, completedHabits, totalCategories, habits }: StatsProps) {
+function Stats({ totalHabits, completedHabits, totalCategories }: StatsProps) {
   const percentage = totalHabits > 0 
     ? Math.round((completedHabits / totalHabits) * 100)
     : 0

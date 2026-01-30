@@ -14,35 +14,62 @@ function CategorySection({ category, habits, onToggle, onDelete, onDeleteCategor
   const totalCount = habits.length
   const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
 
+  const handleDelete = (id: string) => {
+    if (window.confirm('Delete this habit?')) {
+      onDelete(id)
+    }
+  }
+
   return (
     <div className="mb-8 animate-slideIn">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className={`w-12 h-12 ${category.color} rounded-lg flex items-center justify-center text-2xl shadow-md`}>
-            {category.icon}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-4 transition-colors">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className={`w-14 h-14 ${category.color} rounded-xl flex items-center justify-center text-3xl shadow-lg transform transition-transform hover:scale-110`}>
+              {category.icon}
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {category.name}
+              </h2>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-24 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full ${category.color} transition-all duration-300`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                      {completedCount}/{totalCount}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {category.name}
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {completedCount} of {totalCount} completed ({percentage}%)
-            </p>
-          </div>
+          <button
+            onClick={() => {
+              if (window.confirm(`Delete "${category.name}" category and all its habits?`)) {
+                onDeleteCategory(category.id)
+              }
+            }}
+            className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm font-medium transition-all hover:scale-105 px-3 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+          >
+            Delete
+          </button>
         </div>
-        <button
-          onClick={() => onDeleteCategory(category.id)}
-          className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm font-medium transition-colors"
-        >
-          Delete Category
-        </button>
       </div>
 
-      <div className="ml-0 md:ml-16">
+      <div className="space-y-3">
         {habits.length === 0 ? (
-          <div className="text-center py-8 bg-gray-50 dark:bg-gray-800/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
-            <p className="text-gray-500 dark:text-gray-400">
+          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 transition-colors">
+            <p className="text-gray-500 dark:text-gray-400 text-lg mb-1">
               No habits in this category yet
+            </p>
+            <p className="text-gray-400 dark:text-gray-500 text-sm">
+              Add your first {category.name.toLowerCase()} habit above
             </p>
           </div>
         ) : (
@@ -51,7 +78,7 @@ function CategorySection({ category, habits, onToggle, onDelete, onDeleteCategor
               key={habit.id}
               habit={habit}
               onToggle={onToggle}
-              onDelete={onDelete}
+              onDelete={handleDelete}
             />
           ))
         )}
