@@ -19,7 +19,7 @@ function Stats({ totalHabits, completedHabits, totalCategories }: StatsProps) {
       
       <ProgressBar percentage={percentage} />
       
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <div className="text-center transform transition-transform hover:scale-110">
           <p className="text-3xl font-bold text-purple-600 dark:text-purple-400 transition-all">
             {totalCategories}
