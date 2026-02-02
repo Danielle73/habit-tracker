@@ -1,3 +1,4 @@
+// Haptic feedback (vibration)
 export const hapticFeedback = (type: 'light' | 'medium' | 'heavy' = 'light') => {
   if ('vibrate' in navigator) {
     const patterns = {
@@ -9,11 +10,13 @@ export const hapticFeedback = (type: 'light' | 'medium' | 'heavy' = 'light') => 
   }
 }
 
+// Check if running as installed PWA
 export const isStandalone = () => {
   return window.matchMedia('(display-mode: standalone)').matches ||
-         (window.navigator as any).standalone === true
+         ('standalone' in window.navigator && (window.navigator as { standalone?: boolean }).standalone === true)
 }
 
+// Detect mobile device
 export const isMobile = () => {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 }
