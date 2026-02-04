@@ -1,73 +1,78 @@
-# React + TypeScript + Vite
+# Habit Tracker - Build Daily Habits
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Install it like an app, use it offline, build better habits
 
-Currently, two official plugins are available:
+[Live Demo](https://habit-tracker-orcin-seven.vercel.app) | [GitHub](https://github.com/Danielle73/habit-tracker)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## What It Does
+A Progressive Web App (PWA) for tracking daily habits. Create habits, 
+categorise them, and check them off each day, even without internet.
 
-## React Compiler
+## Key Features
+- ✅ Create and categorise daily habits
+- 📱 Install on mobile/desktop (PWA)
+- 🔌 Full offline functionality
+- 💾 Local data persistence
+- ⚡ Fast loading with service worker caching
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
+- **React** - Component-based UI
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Responsive styling
+- **Service Workers** - Offline functionality
+- **localStorage** - Client-side persistence
+- **Vite** - Build tooling
 
-## Expanding the ESLint configuration
+## PWA Architecture
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Browser
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+├── React UI Layer
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+├── Service Worker (enables offline)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+│   ├── Caches app shell
+
+│   ├── Caches static assets
+
+│   └── Background sync
+
+└── localStorage (habit data)
+
+## Why PWA?
+Progressive Web Apps combine the best of web and native apps:
+- **No app store** - Users can install directly from browser
+- **Always up-to-date** - No manual updates needed
+- **Offline-first** - Works without internet
+- **Cross-platform** - One codebase for all devices
+- **Lightweight** - Much smaller than native apps
+
+## Technical Implementation
+- Configured service worker for offline caching
+- Implemented manifest.json for installability
+- Local-first data architecture with localStorage
+- Responsive design optimized for mobile usage
+- Event-driven state updates for habit completion
+
+## What I Learned
+- How to implement service workers for offline functionality
+- PWA manifest configuration and installability requirements
+- Strategies for local-first data persistence
+- Mobile-first responsive design patterns
+- State management for daily tracking applications
+
+## Installation (Development)
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Installation (As User)
+1. Visit [[Here](https://habit-tracker-orcin-seven.vercel.app/)]
+2. Click browser's "Install" button
+3. App installs to home screen
+4. Use like native app, even offline
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Deployed on Vercel • Works Offline • Installable
